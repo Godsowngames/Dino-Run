@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Custom Dino Game</title>
+    <link rel="stylesheet" href="ui.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        .toggle-switch {
+            display: inline-flex;
+            background: #222;
+            border: 2px solid #444;
+            margin: 20px 0;
+        }
+        
+        .toggle-option {
+            padding: 12px 24px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #888;
+        }
+        
+        .toggle-option.active {
+            background: #f0f0f0;
+            color: #000;
+        }
+        
+        .audio-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .audio-item {
+            background: #222;
+            border: 2px solid #444;
+            padding: 15px;
+        }
+        
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .audio-duration {
+            font-size: 9px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-container">
+        <div class="ui-panel">
+            <div class="ui-header">
+                <div class="ui-header-title">CREATE CUSTOM DINO GAME</div>
+                <div class="ui-header-subtitle">CUSTOMIZE YOUR T-REX RUNNER EXPERIENCE</div>
+            </div>
+            
+            <div class="ui-section">
+                <div class="ui-section-title">PLAYER PROFILE</div>
+                <div class="ui-grid-profile">
+                    <div class="ui-avatar-preview" id="avatarPreview">
+                        <canvas class="ui-avatar-canvas" id="avatarCanvas"></canvas>
+                        <div class="ui-avatar-placeholder">
+                            <span style="font-size: 32px; display: block; margin-bottom: 10px;">👤</span>
+                            NO IMAGE
+                        </div>
+                    </div>
+                    <div>
+                        <div class="ui-input-group">
+                            <label class="ui-label" for="playerName">PLAYER NAME</label>
+                            <input type="text" class="ui-input" id="playerName" placeholder="ENTER YOUR NAME" maxlength="20">
+                        </div>
+                        <div class="ui-input-group">
+                            <label class="ui-label" for="avatarUpload">PROFILE PICTURE</label>
+                            <div class="ui-file-wrapper">
+                                <input type="file" class="ui-file-input" id="avatarUpload" accept="image/*">
+                                <div class="ui-file-label">CHOOSE IMAGE</div>
+                            </div>
+                            <div class="ui-error" id="avatarError" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ui-section">
+                <div class="ui-section-title">CUSTOM SOUNDS</div>
+                <div class="audio-section">
+                    <div class="audio-item">
+                        <h4 style="font-size: 11px; margin-bottom: 15px; color: #fff;">JUMP SOUND</h4>
+                        <div class="ui-file-wrapper">
+                            <input type="file" class="ui-file-input" id="jumpSound" accept="audio/mp3,audio/wav,audio/ogg">
+                            <div class="ui-file-label">UPLOAD MP3/WAV (≤5s)</div>
+                        </div>
+                        <div class="audio-controls">
+                            <button class="ui-button-small" id="previewJump">PREVIEW</button>
+                        </div>
+                        <div class="audio-duration" id="jumpDuration">NO FILE</div>
+                        <div class="ui-error" id="jumpError" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="audio-item">
+                        <h4 style="font-size: 11px; margin-bottom: 15px; color: #fff;">DEATH SOUND</h4>
+                        <div class="ui-file-wrapper">
+                            <input type="file" class="ui-file-input" id="deathSound" accept="audio/mp3,audio/wav,audio/ogg">
+                            <div class="ui-file-label">UPLOAD MP3/WAV (≤5s)</div>
+                        </div>
+                        <div class="audio-controls">
+                            <button class="ui-button-small" id="previewDeath">PREVIEW</button>
+                        </div>
+                        <div class="audio-duration" id="deathDuration">NO FILE</div>
+                        <div class="ui-error" id="deathError" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ui-section">
+                <div class="ui-section-title">VISIBILITY</div>
+                <div style="text-align: center;">
+                    <div class="toggle-switch">
+                        <div class="toggle-option active" data-value="private">PRIVATE</div>
+                        <div class="toggle-option" data-value="public">PUBLIC</div>
+                    </div>
+                    <p style="font-size: 10px; color: #888; margin-top: 10px;">
+                        <span id="privateDesc">ONLY YOU CAN ACCESS THIS GAME</span>
+                        <span id="publicDesc" style="display: none;">GAME WILL BE LISTED IN PUBLIC GAMES</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="ui-button-group">
+                <button class="ui-button ui-button-secondary" id="btnHome">
+                    HOME
+                </button>
+                <button class="ui-button ui-button-secondary" id="btnPublicGames">
+                    PUBLIC GAMES
+                </button>
+                <button class="ui-button ui-button-primary" id="btnCreateGame">
+                    CREATE GAME
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading" id="loadingOverlay">
+        <div style="margin-bottom: 20px;">CREATING GAME<span class="ui-loading-dots"></span></div>
+        <div style="font-size: 10px; color: #888;">PLEASE WAIT</div>
+    </div>
+    
+    <script src="ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            ui.init();
+            
+            // Update visibility description
+            document.querySelectorAll('.toggle-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (this.dataset.value === 'private') {
+                        document.getElementById('privateDesc').style.display = 'inline';
+                        document.getElementById('publicDesc').style.display = 'none';
+                    } else {
+                        document.getElementById('privateDesc').style.display = 'none';
+                        document.getElementById('publicDesc').style.display = 'inline';
+                    }
+                });
+            });
+            
+            // Show loading on create
+            document.getElementById('btnCreateGame').addEventListener('click', function() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            });
+        });
+    </script>
+</body>
+</html>
