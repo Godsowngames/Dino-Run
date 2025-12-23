@@ -1,0 +1,13 @@
+{
+  "name": "rex-remix-platform",
+  "version": "1.0.0",
+  "description": "Custom Dino Game Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+}
